@@ -1,0 +1,64 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@android:color/white"
+    android:keepScreenOn="true"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/tvTime"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:text="00:00:00"
+        android:textColor="@android:color/black"
+        android:textSize="40sp" >
+
+
+    </TextView>
+    <TextView
+        android:id="@+id/tvDebug"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:textColor="@android:color/black" >
+    </TextView>
+    <TextView
+        android:id="@+id/tvTap"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tvTime"
+        android:gravity="center_horizontal"
+        android:paddingTop="20dp"
+        android:text="@string/taptostart"
+        android:textColor="@android:color/black"
+        android:textSize="35sp" >
+
+    </TextView>
+
+
+            <ImageView
+            android:id="@+id/ivPotato"
+            android:layout_width="match_parent"
+            android:layout_height="334dp"
+            android:layout_alignParentBottom="true"
+            android:scaleType="fitEnd"
+            android:src="@drawable/potato_mid"
+            android:layout_above="@+id/ivToe"
+
+            android:gravity = "bottom"/>
+
+        <ImageView
+            android:id="@+id/ivToe"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:scaleType="fitEnd"
+            android:src="@drawable/toe"
+            android:gravity = "bottom"/>
+
+
+
+
+
+    </RelativeLayout>
