@@ -274,7 +274,7 @@ public class MainActivity extends Activity  implements SensorEventListener
 		{
 			return;
 		}
-		
+
   		
   		//else it will output the Roll, Pitch and Yawn values
   		//tvDebug.setText("Orientation X (Roll) :"+ Float.toString(event.values[2]) +"\n"+
@@ -287,7 +287,10 @@ public class MainActivity extends Activity  implements SensorEventListener
   		if(!pot.start)
   		{
 			//Potato gyorsulasahoz adjuk a szenzor erteket
-  			pot.asc += event.values[2];
+  			pot.ascGyr = event.values[2];
+
+
+
   		}
 	}
   			 

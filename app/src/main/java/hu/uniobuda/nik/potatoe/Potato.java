@@ -27,6 +27,7 @@ public class Potato
 	Context ctx;
 	 	Random rnd = new Random();
 		public float asc=0f;
+	public float ascGyr=0f;
 		public int elTime =0;
 	public int tickTime =0;
 		private float difficulty = 0.0f;
@@ -45,6 +46,8 @@ public class Potato
 		public void setListener(IPotato listener) {
 	        this.potatoListener = listener;
 	    }
+
+	//timer inditasa
 		private void StartTimer()
 		{
 			t = new Timer();
@@ -58,8 +61,9 @@ public class Potato
 		     @Override  
 		     public void run() {  
 		        
-		   
+		   //gyorsulas szamitasa
 		    	 AscInit();
+				 //forgatas elvegzese eredmenyben az uj szog
 		    	 float angle = RotatePotato(asc);
 
 		    	 if(Math.abs(angle) >60)
@@ -80,6 +84,7 @@ public class Potato
 		    		 if(start) {
 						 tickTime--;
 
+						 //50 millisec miatt minden 2 ticket szamolunk (1xubb a vegen mp-be atszamolni)
 						 if (tickTime % 2 == 0) {
 							 elTime--;
 						 }
@@ -209,6 +214,7 @@ public class Potato
 	           return (float)angle;
 	    }
 
+	//digitalis ora szamolasa millisecundumbol
 		public String ParseTimeFromElTime(int score)
 		{
 			 int tempTime = score /10;
@@ -258,7 +264,7 @@ public class Potato
 			  return hourStr+":"+minStr+":"+secStr;
 
 		}
-
+//ido kiiratasa
 		private void WriteTime()
 		  {
 
@@ -300,20 +306,24 @@ public class Potato
 			  if(!start)
 		        {
 				  float diff=1f+difficulty;
-				  
+
+					//a gravitaciot legjobban logaritmikus fv-el sikerult kozeliteni
 				 if(Math.abs(asc)<40 && asc != 0)
 				 {
-					 diff = 1f+difficulty;
+
+					 diff =  (float)Math.log(Math.abs(asc))+difficulty;
 					 
 				 }
 				 else
 				 {
-					 diff=1f+difficulty;
+					 diff=(float)Math.log(Math.abs(asc))+difficulty*2;
 				 }
+
+				/*	Log.d("Potato", "ascGyr: " + ascGyr);
 
 					Log.d("Potato", "asc: " + asc);
 					Log.d("Potato", "diff: " + diff);
-
+*/
 				 	 if (asc <0)
 			    	 {
 			    		 asc -=diff;
@@ -336,7 +346,9 @@ public class Potato
 				    		  }
 				    	 }
 				 	 }
-			    	 
+
+//az aktualis logaritmikus eredmenyhez hozzadjuk a gyroscop erteket
+					asc+=ascGyr;
 		        }	
 			  
 			  

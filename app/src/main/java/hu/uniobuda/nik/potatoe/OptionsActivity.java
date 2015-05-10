@@ -32,14 +32,16 @@ public class OptionsActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_options);
 
-
+//radiobuttongroup
         rbDiff = (RadioGroup) findViewById(R.id.rbDifficulty);
 
 
+        //mentett nehezsegi fok lekerese
         prefs = this.getSharedPreferences("PotaToe", Context.MODE_PRIVATE);
         int diff = prefs.getInt("Difficulty", 0); //0 is the default value
 
 
+        //megfelelo radiobutton kivalasztasa
         switch (diff)
         {
             case 0:
@@ -88,7 +90,7 @@ public class OptionsActivity extends Activity {
 
                 prefs = OptionsActivity.this.getSharedPreferences("PotaToe", Context.MODE_PRIVATE);
 
-
+//nehezsegi szint visszairasa
                 SharedPreferences.Editor editor = prefs.edit();
 
                 editor.putInt("Difficulty", selectedDiff);
