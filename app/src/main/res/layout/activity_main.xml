@@ -40,17 +40,16 @@
             <ImageView
             android:id="@+id/ivPotato"
             android:layout_width="match_parent"
-            android:layout_height="334dp"
-            android:layout_alignParentBottom="true"
+            android:layout_height="wrap_content"
             android:scaleType="fitEnd"
-            android:src="@drawable/potato_mid"
+            android:src="@drawable/potato_level"
             android:layout_above="@+id/ivToe"
-
+            android:layout_alignParentBottom="true"
             android:gravity = "bottom"/>
 
         <ImageView
             android:id="@+id/ivToe"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:scaleType="fitEnd"

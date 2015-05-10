@@ -1,7 +1,5 @@
 package hu.uniobuda.nik.potatoe;
 
-import java.util.Random;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -9,9 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
+
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -35,26 +31,31 @@ public class MainActivity extends Activity  implements SensorEventListener
 	    TextView tvTap;
 
 	    boolean guiStarted=false;
-	  //  FacebookAPI fbApi = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) 
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        
+
+		//controlok lekerese
         tvTime = (TextView) findViewById(R.id.tvTime);
         tvTap = (TextView) findViewById(R.id.tvTap);
-        
-        
-        ImageView ivPotato = (ImageView)findViewById(R.id.ivPotato);  
-        ImageView ivToe = (ImageView)findViewById(R.id.ivToe);
+        ImageView ivPotato = (ImageView)findViewById(R.id.ivPotato);
 
-
+		//szenor inicializalas
 		sManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-        
-        pot = new Potato(this, tvTime, ivPotato, ivToe,MainActivity.this);
+
+
+		SharedPreferences prefs = this.getSharedPreferences("PotaToe", Context.MODE_PRIVATE);
+		int diff = prefs.getInt("Difficulty", 0); //0 is the default value
+
+
+		//Potato deklaralasa
+        pot = new Potato(this, tvTime, ivPotato, MainActivity.this,diff);
     
-        
+
+		//feliratkozas
         pot.potatoListener = new IPotato() {
 			
 			@Override
@@ -68,14 +69,15 @@ public class MainActivity extends Activity  implements SensorEventListener
 				}
 			}
 		};
-		//	fbApi = new FacebookAPI(MainActivity.this);
-	
+
     }
 
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         // TODO Auto-generated method stub
+		//tuch esemenyre indul a jatek
+
     	 if(!pot.start  && !guiStarted)
     	 {
          //v.getId() will give you the image id
@@ -95,7 +97,9 @@ public class MainActivity extends Activity  implements SensorEventListener
    		/*register the sensor listener to listen to the gyroscope sensor, use the 
    		 * callbacks defined in this class, and gather the sensor information as  
    		 * quick as possible*/
-   		sManager.registerListener(this, sManager.getDefaultSensor(Sensor.TYPE_ORIENTATION),SensorManager.SENSOR_DELAY_FASTEST);
+
+//szenozrra feliratkozas
+   		sManager.registerListener(this, sManager.getDefaultSensor(Sensor.TYPE_ORIENTATION), SensorManager.SENSOR_DELAY_FASTEST);
    	}
 
        //When this Activity isn't visible anymore
@@ -103,6 +107,7 @@ public class MainActivity extends Activity  implements SensorEventListener
    	protected void onStop() 
    	{
    		//unregister the sensor listener
+		//szenzorrol leiratkozas
    		sManager.unregisterListener(this);
    		super.onStop();
    	}
@@ -117,14 +122,19 @@ public class MainActivity extends Activity  implements SensorEventListener
     }  
     
     @Override  
-    public boolean onOptionsItemSelected(MenuItem item) {  
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+		//menu kezelese
         switch (item.getItemId()) {
             case R.id.highScore:
             	ShowHighScore(false);
              
-            return true;     
-
-            case R.id.Exit:
+            return true;
+			case R.id.options:
+				Intent myIntent = new Intent(MainActivity.this, OptionsActivity.class);
+				myIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				MainActivity.this.startActivity(myIntent);
+			case R.id.Exit:
                 Exit();  
               return true;     
   
@@ -136,6 +146,7 @@ public class MainActivity extends Activity  implements SensorEventListener
     
     public void ShowHighScore(boolean newScore)
     {
+		//legjobb eredmenyek olvasasa a keszulekrol
     	SharedPreferences prefs = this.getSharedPreferences("PotaToe", Context.MODE_PRIVATE);
     	int score = prefs.getInt("HighScore", 0); //0 is the default value
     	
@@ -144,10 +155,10 @@ public class MainActivity extends Activity  implements SensorEventListener
     	 AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
 	 
     	 
-    	 String title = "Your high score";
+    	 String title = getResources().getString(R.string.YourHighScore);
     	 if(newScore)
     	 {
-    		 title = "New high score"; 
+    		 title = getResources().getString(R.string.NewHighScore);
     		 
     	 }
     		 
@@ -161,7 +172,7 @@ public class MainActivity extends Activity  implements SensorEventListener
 				
 				if(!newScore)
 				{
-					alertDialogBuilder.setPositiveButton("Ok",new DialogInterface.OnClickListener() {
+					alertDialogBuilder.setPositiveButton(R.string.ok,new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog,int id) {
 							dialog.cancel();
 						}
@@ -169,21 +180,15 @@ public class MainActivity extends Activity  implements SensorEventListener
 				}
 				else
 				{
-					alertDialogBuilder.setPositiveButton("Restart",new DialogInterface.OnClickListener() {
+					alertDialogBuilder.setPositiveButton(R.string.Restart,new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog,int id) {
 							dialog.cancel();
 						
 							
 						}})
-						.setNegativeButton("Exit",new DialogInterface.OnClickListener() {
+						.setNegativeButton(R.string.Exit,new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog,int id) {
 								Exit();
-							}
-						})
-						.setNeutralButton("Share", new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface arg0, int arg1) {
-								ShareToFaceBook();	
-								
 							}
 						})
 						;
@@ -197,22 +202,7 @@ public class MainActivity extends Activity  implements SensorEventListener
     }
     
     
-    public void ShareToFaceBook()
-    {
-    	/*
-		Intent postOnFacebookWallIntent = new Intent(MainActivity.this, MainActivity.class);
-		postOnFacebookWallIntent.putExtra("facebookMessage", "PotaToe score: "+pot.ParseTimeFromElTime(pot.elTime));
-		startActivity(postOnFacebookWallIntent);
-		*/
-    	
-    //	fbApi.messageToPost = "PotaToe score: "+pot.ParseTimeFromElTime(pot.elTime);
-   // 	fbApi.loginAndPostToWall();
-    	
-    	/*Intent postOnFacebookWallIntent = new Intent(this, FacebookAPI.class);
-    	postOnFacebookWallIntent.putExtra("facebookMessage", "is integrating stuff again.");
-    	startActivity(postOnFacebookWallIntent);
-    	*/
-    }
+
     public void ShowTime()
     {
     	//Toast.makeText(getApplicationContext(),Integer.toString(score),Toast.LENGTH_LONG).show();
@@ -220,37 +210,25 @@ public class MainActivity extends Activity  implements SensorEventListener
     	 AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
 
 				// set title
-				alertDialogBuilder.setTitle("The potato is dead. Your time:");
+				alertDialogBuilder.setTitle(R.string.DeadPotato);
 	 
 				// set dialog message
 				alertDialogBuilder
 					.setMessage(pot.ParseTimeFromElTime(pot.elTime))
 					.setCancelable(false)
-					.setPositiveButton("Restart",new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog,int id) {
+					.setPositiveButton(R.string.Restart, new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
 							dialog.cancel();
 							tvTap.setVisibility(View.VISIBLE);
 							guiStarted = false;
-						}})
-						.setNegativeButton("Exit",new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog,int id) {
+						}
+					})
+						.setNegativeButton(R.string.Exit, new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int id) {
 								Exit();
 							}
 						})
-									.setNeutralButton("Share", new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface arg0, int arg1) {
-								
-								
-								ShareToFaceBook();
-								
-								
-								/* Intent shareIntent = new Intent(Intent.ACTION_SEND);
-								  shareIntent.setType("text/plain");
-								  shareIntent.putExtra(Intent.EXTRA_TEXT, "http://google.com");
-								  startActivity(Intent.createChooser(shareIntent, "Share PotaToe..."));*/								
-								
-							}
-						})
+
 						;
 				
 	 
@@ -264,10 +242,13 @@ public class MainActivity extends Activity  implements SensorEventListener
     public boolean SetHighScore()
     {
     	int score = pot.elTime;
-    	
+
+		//legjobb eredmeny olvasasa
     	SharedPreferences prefs = this.getSharedPreferences("PotaToe", Context.MODE_PRIVATE);
     	int oldScore = prefs.getInt("HighScore", 0); //0 is the default value
-    	
+
+
+		//rekordot dontottunk, felulirjuk
     	if(oldScore<score)
     	{
     		Editor editor = prefs.edit();
@@ -299,23 +280,13 @@ public class MainActivity extends Activity  implements SensorEventListener
   		//tvDebug.setText("Orientation X (Roll) :"+ Float.toString(event.values[2]) +"\n"+
   			//	   "Orientation Y (Pitch) :"+ Float.toString(event.values[1]) +"\n"+
   				//   "Orientation Z (Yaw) :"+ Float.toString(event.values[0]));
-  		
-  		float[] maxArray = new float[]{Math.abs(event.values[1]),Math.abs(event.values[2])};
-  		
-  		float max = maxArray[0];
-  		int maxIndex =0;
-  		
-  		for(int i=1;i<maxArray.length;i++)
-  		{
-  				if(max<maxArray[i])
-  				{
-  					max = maxArray[i];
-  					maxIndex = i;
-  				}
-  		}
+
+		//szenzor olvasasa : a 2-es indexu x koordinatat vesszuk figyelembe
+
   		
   		if(!pot.start)
   		{
+			//Potato gyorsulasahoz adjuk a szenzor erteket
   			pot.asc += event.values[2];
   		}
 	}

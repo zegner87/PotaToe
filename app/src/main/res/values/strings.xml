@@ -3,4 +3,19 @@
     <string name="taptostart"> Tap to start.</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="ok">Ok</string>
+    <string name="Restart">Restart</string>
+    <string name="Exit">Exit</string>
+    <string name="Options">Options</string>
+    <string name="HighScore">High score</string>
+    <string name="YourHighScore">Your high score</string>
+    <string name="NewHighScore">New high score</string>
+    <string name="DeadPotato">The potato is dead. Your time:</string>
+    <string name="Cancel">Cancel</string>
+    <string name="Easy">Easy</string>
+    <string name="Normal">Normal</string>
+    <string name="Hard">Hard</string>
+    <string name="Difficulty">Difficulty</string>
+
+
 </resources>

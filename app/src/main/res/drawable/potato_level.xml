@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<level-list xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item android:drawable="@drawable/potato_mid" android:maxLevel="1"/>
+    <item android:drawable="@drawable/potato_left" android:maxLevel="2"/>
+    <item android:drawable="@drawable/potato_scary_left" android:maxLevel="3"/>
+    <item android:drawable="@drawable/potato_right" android:maxLevel="4"/>
+    <item android:drawable="@drawable/potato_scary_right" android:maxLevel="5"/>
+    <item android:drawable="@drawable/potato_dead" android:maxLevel="6"/>
+</level-list>

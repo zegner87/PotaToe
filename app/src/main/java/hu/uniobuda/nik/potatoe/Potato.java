@@ -6,25 +6,29 @@ import java.util.TimerTask;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
-import android.graphics.Paint;
+import android.graphics.drawable.BitmapDrawable;
 import android.util.Log;
+import android.view.Display;
+import android.view.WindowManager;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.ImageView.ScaleType;
 
 public class Potato
 {
 
-		Context ctx;
+	private int optDifficulty;
+	private int IvHeight;
+	private int IvWidth;
+	private int ImageWidth;
+	private int ImageHeight;
+	Context ctx;
 	 	Random rnd = new Random();
 		public float asc=0f;
 		public int elTime =0;
+	public int tickTime =0;
 		private float difficulty = 0.0f;
 		public boolean start = true;
 		Timer t = null;
@@ -32,9 +36,11 @@ public class Potato
 		
 		private TextView tvTime;
 		private ImageView ivPotato;
-		private ImageView ivToe;
 		IPotato potatoListener = null;
 		private Activity act;
+
+	private int ScreenWidth;
+	private int ScreenHeight;
 		
 		public void setListener(IPotato listener) {
 	        this.potatoListener = listener;
@@ -54,279 +60,239 @@ public class Potato
 		        
 		   
 		    	 AscInit();
-		    	 float angle = RotatePotato2(asc);
-		    	 
+		    	 float angle = RotatePotato(asc);
+
 		    	 if(Math.abs(angle) >60)
 		    	 {
 		    		 t.cancel();
-		    		 
+
 		    		 if (potatoListener != null)
 		    		 {
 		    			 potatoListener.onEndGame();
-		    			 RotatePotato2(0);
-		    			 
-		    		 }
-		    		
+		    			 RotatePotato(0);
 
-		    		 
-		    		 
-		    		
+		    		 }
 
 		    	 }
 		    	 else
 		    	 {
-		    	 
-		    		 if(start)
-		    		 {
-		    			elTime--;
+
+		    		 if(start) {
+						 tickTime--;
+
+						 if (tickTime % 2 == 0) {
+							 elTime--;
+						 }
 		    		 }
 		    		 else
 		    		 {
-		    			 elTime++;
+						 tickTime++;
+						 if (tickTime % 2 == 0) {
+							 elTime++;
+						 }
 		    		 }
+
+
 			    	 if(elTime % 10 == 0)
 			    	 {
 			    		 WriteTime();
-			    		 
+
 			    		 if(elTime % 50 == 0)
 			    		 {
 			    			 difficulty += 0.5f;
-			    			 
+
 			    		 }
-			    		 
+
 			    		 if(elTime % 600 == 0)
 			    		 {
 			    			 difficulty = difficulty / 2;
-			    			 
+
 			    		 }
-			    		
+
 			    		 if(elTime == 0)
 			    		 {
 			    			 start = false;
-			    			 
+
 			    		 }
 			    	 }
-			    	 
+
 		    	 }
-		     }  
-		    });  
-		   }  
-		  };  
+		     }
+		    });
+		   }
+		  };
 		}
-		
+
 		public float RotatePotato(float x)
 	    {
-	    	
-	    	   Paint paint = new Paint();
-	           paint.setColor(Color.parseColor("#CD5C5C"));
-	           Paint paint2 = new Paint();
-	           paint2.setColor(Color.parseColor("#FFFFFF"));
+		/*	Log.d("Potato", "ivwidth: " + IvWidth);
+			Log.d("Potato", "imagewidth: " + ImageWidth);
+			Log.d("Potato", "screenwidth: " + ScreenWidth);
+*/
 
-
-//	           Bitmap bg = Bitmap.createBitmap(480, 800, Bitmap.Config.ARGB_8888);
-		//	Log.d("Potato", "RotatePotato — width: " + ivPotato.getWidth());
-			Bitmap bg = Bitmap.createBitmap((int)(ivPotato.getWidth()),(int)(ivPotato.getHeight()), Bitmap.Config.ARGB_8888);
-	           Canvas canvas = new Canvas(bg);
-
-
-	           float l1 = 0.83f*ivPotato.getHeight();
-	           float l2 = x*2;
+				//segedvonalak szamitasa
+	           float l1 = IvHeight*0.78f;
+	           float l2 = x;
 	           float l3 = (float)Math.sqrt(l1*l1+l2*l2);
-	           
-	           float angle = (float)Math.asin(l2/l3)*80;
-	           
+
+		/*	Log.d("Potato", "l1: " + l1);
+			Log.d("Potato", "l2: " + l2);
+			Log.d("Potato", "l3: " + l3);
+			*/
+				//forditasi szog a fuggoleges tengelyhez kepest
+	           double angle = Math.toDegrees((double)Math.asin(l2 / l3));
+		/*	Log.d("Potato", "angle: " + angle);
+			Log.d("Potato", "x: " + x);*/
+
+
+			//a fordulasi szog fv-eben mas-mas kepet toltunk be
 	           if(angle>60 || angle < -60)
 	           {
-	        	   ivPotato.setImageResource(R.drawable.potato_dead);
-
-				   ivPotato.setBackgroundColor(0xFF0000);
+				   ivPotato.setImageLevel(6);
 	           }
 	           else
 	           {
 		           if(angle>45)
 		           {
-		        	   ivPotato.setImageResource(R.drawable.potato_mid_scary_right);
-					   ivPotato.setBackgroundColor(0xFF0000);
-		        	   
+					   ivPotato.setImageLevel(5);
 		           }
 		           else
 		           {
 		        	   if(angle<-45)
 		               {
-		        		   ivPotato.setImageResource(R.drawable.potato_mid_scary_left);
-						   ivPotato.setBackgroundColor(0xFF0000);
-		            	   
-		               }   
+						   ivPotato.setImageLevel(3);
+		               }
 		        	   else
 		        	   {
-		        		   if(angle>25)
-		        		   {
-		        			   ivPotato.setImageResource(R.drawable.potato_right);
-							   ivPotato.setBackgroundColor(0xFFFF00);
+		        		   if(angle>25) {
+							   ivPotato.setImageLevel(4);
 		        		   }
 		        		   else
 		        		   {
 		        			   if(angle<-25)
 		        			   {
-		        				   ivPotato.setImageResource(R.drawable.potato_left);
-								   ivPotato.setBackgroundColor(0xFFFF00);
-
-
+								   ivPotato.setImageLevel(2);
 							   }
-		        			   else
-		        			   {
-		        				   ivPotato.setImageResource(R.drawable.potato_mid);
-								   ivPotato.setBackgroundColor(0xffffff);
-
-							   }
+		        			   else {
+								   ivPotato.setImageLevel(1);
+		        				}
 		        		   }
-		        		   
+
 		        	   }
-		        	   
+
 		           }
 	           }
-	           
-	          // canvas.drawRect(0,0,480,800,paint2);
-	          // canvas.drawLine(a1, b1, a2, b2, paint);
-	           //LinearLayout ll = (LinearLayout) findViewById(R.id.rect);
-	           //ll.setBackgroundDrawable(new BitmapDrawable(bg));   
-	           
-	      //    tv.setText("asc: "+asc +" ,angle: "+ Float.toString(angle));
-	         
-	           int oldHeight = ivPotato.getHeight();
-	           int oldWidth = ivPotato.getWidth();
-	           
 
+
+
+
+			//forditasi matrix deklaralasa
 	           Matrix matrix=new Matrix();
-	          // Matrix matrix2=new Matrix();
 	           ivPotato.setScaleType(ScaleType.MATRIX);   //required
-	           //ivToe.setScaleType(ScaleType.MATRIX);   //required
-	           matrix.postRotate(angle,oldWidth,oldHeight*2*0.8f);
-	          // matrix2.postRotate(0,oldWidth,oldHeight*2*0.8f);
-	           if(oldWidth >0 && oldHeight >0)
-	           {
-	           
-	           
-	           double radians = Math.toRadians(angle);
-	           double sin = Math.abs(Math.sin(angle));
-	           double cos = Math.abs(Math.cos(angle));
-	        
-	           
-	           int newWidth = (int)(oldWidth/cos);
-	           int newHeight = (int)(oldHeight /sin);
-	          
-	           
-	   //        tvDebug.setText(oldWidth+" "+newWidth);
-	           //matrix.postScale((float)((float)oldWidth /(float)newWidth),(float)((float)oldHeight /(float)newHeight));
-	        //   matrix.postTranslate((newWidth - oldWidth) / 2, (newHeight - oldHeight) / 2);
-	    //       tvDebug.setText(iv.getWidth());
-				   float scalewidth = (float) oldWidth  / (float) newWidth;
-				   float scaleheight = (float) oldHeight / (float) newHeight;
 
-				   //matrix.postScale(scalewidth,scaleheight);
-				   matrix.postScale(0.5f,0.5f);
+			//a forgatas elvegzese a matrixon
+	           matrix.postRotate((float)angle, ImageWidth/2, ImageHeight*0.78f);
 
-				 //  matrix2.postScale(0.50f,0.53f);
-
-	           }
+			//kep kicsinyitese, ha nagyobb mint a kijelzo
+				   if(ImageWidth>ScreenWidth)
+				   {
 
 
+
+				   float scalewidth = (float)ScreenWidth   / (float) ImageWidth;
+				   matrix.postScale(scalewidth,scalewidth);
+				   }
+
+			//matrix alkalmazasa az imageview-n
 	           ivPotato.setImageMatrix(matrix);
-	           //ivToe.setImageMatrix(matrix2);
-	           
-	        //   ivPotato.setScaleType(ScaleType.FIT_END);
-	        //   ivToe.setScaleType(ScaleType.FIT_END);
-	      
-	           
-	           return angle; 
+
+	           return (float)angle;
 	    }
 
-	public float RotatePotato2(float x) {
-
-		return RotatePotato(x);
-	}
-	   
 		public String ParseTimeFromElTime(int score)
 		{
 			 int tempTime = score /10;
-			  
+
 			  String hourStr ="";
 			  String minStr ="";
 			  String secStr ="";
-			  
+
 			  int hourInt =0;
 			  int minInt =0;
 			  int secInt =0;
-			
+
 			  hourInt = tempTime /3600;
-			  
+
 			  tempTime -= hourInt*3600;
-			  
+
 			  if(score >0)
 			  {
 				  minInt = tempTime/60;
 				  tempTime -= minInt*60;
-				  
+
 				  if(score >0)
 				  {
-					secInt = tempTime;  
+					secInt = tempTime;
 				  }
 			  }
-			  
+
 			  if(hourInt <10)
 			  {
 				  hourStr = "0";
 			  }
-			  
+
 			  if(minInt <10)
 			  {
 				  minStr = "0";
 			  }
-			  
+
 			  if(secInt <10)
 			  {
 				  secStr = "0";
 			  }
-			  
+
 			  hourStr += hourInt;
 			  minStr += minInt;
 			  secStr += secInt;
-			  	
+
 			  return hourStr+":"+minStr+":"+secStr;
-			
+
 		}
-		
+
 		private void WriteTime()
 		  {
-			
+
 			String timeStr =  ParseTimeFromElTime(elTime);
 			  if(start)
-			  {		  
+			  {
 				  tvTime.setTextColor(Color.RED);
 			  }
 			  else
 			  {
 				  tvTime.setTextColor(Color.BLACK);
 			  }
-			  
+
 			  tvTime.setText(timeStr);
-			  
+
 		  }
-		 
+
 		 public void Start()
 		  {
-	    	
+
 			 elTime = 31;
 	  		 asc = 0;
 	  		 start = true;
-	  		 difficulty = 0f;
-	  		 
-	  		 
-	  		 RotatePotato2(0);
+	  		 difficulty = optDifficulty*10;
+
+
+			  this.IvWidth = ivPotato.getWidth();
+			  this.IvHeight = ivPotato.getHeight();
+
+	  		 RotatePotato(0);
 	  		 
 	  		 AscInit();
 	  		StartTimer();  
-	  		 t.scheduleAtFixedRate(task, 0, 100);
+	  		 t.scheduleAtFixedRate(task, 0, 50);
 	  	    
 		  }
 		  private void AscInit()
@@ -337,14 +303,17 @@ public class Potato
 				  
 				 if(Math.abs(asc)<40 && asc != 0)
 				 {
-					 diff = Math.abs(asc)/10+difficulty;
+					 diff = 1f+difficulty;
 					 
 				 }
 				 else
 				 {
-					 diff=5+difficulty;
+					 diff=1f+difficulty;
 				 }
-			    
+
+					Log.d("Potato", "asc: " + asc);
+					Log.d("Potato", "diff: " + diff);
+
 				 	 if (asc <0)
 			    	 {
 			    		 asc -=diff;
@@ -374,20 +343,33 @@ public class Potato
 
 		  }
 		  
-		  public Potato(Activity act, TextView tvTime, ImageView ivPotato, ImageView ivToe, Context ctx)
+		  public Potato(Activity act, TextView tvTime, ImageView ivPotato, Context ctx, int optDifficulty)
 		  {
 			  this.tvTime = tvTime;
 			  this.ivPotato = ivPotato;
-			  this.ivToe = ivToe;
 			  this.act = act;
 			  this.ctx = ctx;
 
 			  elTime = 31;
 			  asc = 0;
 			  start = false;
-		  	  difficulty = 0f;
-		  	  
-		  
+		  	  this.optDifficulty = optDifficulty;
+
+			  WindowManager wm = (WindowManager) ctx.getSystemService(Context.WINDOW_SERVICE);
+			  Display display = wm.getDefaultDisplay();
+
+			  this.ScreenWidth = display.getWidth();  // deprecated
+			  this.ScreenHeight  = display.getHeight();
+
+
+			  //a kep meretenek lekerese
+			  BitmapDrawable bd=(BitmapDrawable) ctx.getResources().getDrawable(R.drawable.potato_mid);
+			  this.ImageHeight=bd.getBitmap().getHeight();
+			  this.ImageWidth=bd.getBitmap().getWidth();
+
+			  //imageview meretei
+			  this.IvWidth = ivPotato.getWidth();
+			  this.IvHeight = ivPotato.getHeight();
 		  }
 		  
 		  public void Begin()
